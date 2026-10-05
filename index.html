@@ -11,6 +11,15 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <script>
+      window.addEventListener('error', function(e) {
+        console.error('Global runtime error:', e);
+        var el = document.getElementById('root');
+        if (el && !el.hasChildNodes()) {
+          el.innerHTML = '<div style="padding:24px;font-family:sans-serif;color:#fff;background:#020617;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"><div style="background:#ef444422;color:#f87171;padding:8px 16px;border-radius:12px;margin-bottom:16px;font-weight:bold;">페이지 로딩 안내</div><p style="font-size:14px;color:#cbd5e1;margin-bottom:16px;">일시적인 스크립트 로딩 지연이 발생했습니다.<br>' + (e.message || '') + '</p><button onclick="window.location.reload(true)" style="padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:bold;cursor:pointer;">새로고침</button></div>';
+        }
+      });
+    </script>
   </head>
   <body class="font-sans antialiased bg-slate-950 text-slate-100">
     <div id="root"></div>

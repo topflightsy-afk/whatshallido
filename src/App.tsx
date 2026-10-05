@@ -61,6 +61,13 @@ export default function App() {
       if (params.get('view') === 'learner' || window.location.hash.includes('learner')) {
         return 'learner';
       }
+      if (params.get('view') === 'presenter') {
+        return 'presenter';
+      }
+      // If mobile screen, automatically default to learner response mode
+      if (window.innerWidth < 768) {
+        return 'learner';
+      }
     }
     return 'presenter';
   });
@@ -80,6 +87,38 @@ export default function App() {
     if (typeof window === 'undefined') return '';
     const origin = window.location.origin;
     return `${origin}/?view=learner`;
+  }, []);
+
+  // Initial HTTP fetch + periodic polling fallback (ensures rock-solid reliability on serverless)
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLatest = async () => {
+      try {
+        const [resResp, resSession] = await Promise.all([
+          fetch('/api/responses').then((r) => (r.ok ? r.json() : null)),
+          fetch('/api/session').then((r) => (r.ok ? r.json() : null)),
+        ]);
+        if (!isMounted) return;
+        if (resResp && Array.isArray(resResp.responses)) {
+          setResponses(resResp.responses);
+          setIsConnected(true);
+        }
+        if (resSession && resSession.session) {
+          setSession(resSession.session);
+        }
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    };
+
+    fetchLatest();
+    const interval = setInterval(fetchLatest, 3000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Connect to SSE stream
