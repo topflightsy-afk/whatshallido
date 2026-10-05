@@ -3,6 +3,7 @@ import { ResponseItem, SessionState } from '../types';
 import { CATEGORY_THEMES, DEFAULT_THEME } from '../utils/grouping';
 import {
   Send,
+  Sparkles,
   Heart,
   CheckCircle2,
   PlusCircle,

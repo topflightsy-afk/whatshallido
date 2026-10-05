@@ -3,12 +3,56 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, Component, ErrorInfo, ReactNode } from 'react';
 import { ResponseItem, SessionState } from './types';
 import { clusterResponses } from './utils/grouping';
 import { PresenterScreen } from './components/PresenterScreen';
 import { LearnerScreen } from './components/LearnerScreen';
 import { Monitor, Smartphone } from 'lucide-react';
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = {
+    hasError: false,
+  };
+
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo);
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mb-4 text-xl font-bold">
+            !
+          </div>
+          <h2 className="text-lg font-bold mb-2">화면을 불러오는 중 오류가 발생했습니다</h2>
+          <p className="text-xs text-slate-400 mb-5 max-w-xs">{this.state.error?.message || '새로고침을 눌러 다시 접속해 주세요.'}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-semibold shadow-lg shadow-blue-500/25 active:scale-95 transition-all"
+          >
+            페이지 새로고침
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'presenter' | 'learner'>(() => {
@@ -220,56 +264,58 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* View Switcher Floating Badge (Presenter <-> Learner) */}
-      <aside aria-label="화면 전환" className="fixed top-3 right-3 z-50 flex items-center p-1 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md text-xs">
-        <button
-          onClick={() => switchView('presenter')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all font-semibold ${
-            currentView === 'presenter'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Monitor className="w-3.5 h-3.5" />
-          <span>강사용 화면</span>
-        </button>
-        <button
-          onClick={() => switchView('learner')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all font-semibold ${
-            currentView === 'learner'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Smartphone className="w-3.5 h-3.5" />
-          <span>학습자 화면</span>
-        </button>
-      </aside>
+    <ErrorBoundary>
+      <div className="relative min-h-screen">
+        {/* View Switcher Floating Badge (Presenter <-> Learner) */}
+        <aside aria-label="화면 전환" className="fixed top-3 right-3 z-50 flex items-center p-1 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md text-xs">
+          <button
+            onClick={() => switchView('presenter')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all font-semibold ${
+              currentView === 'presenter'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Monitor className="w-3.5 h-3.5" />
+            <span>강사용 화면</span>
+          </button>
+          <button
+            onClick={() => switchView('learner')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all font-semibold ${
+              currentView === 'learner'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>학습자 화면</span>
+          </button>
+        </aside>
 
-      {/* Active Screen */}
-      {currentView === 'presenter' ? (
-        <PresenterScreen
-          session={session}
-          responses={responses}
-          groups={groups}
-          joinUrl={joinUrl}
-          onLike={handleLike}
-          onReset={handleReset}
-          onSeed={handleSeed}
-          onToggleStatus={handleToggleStatus}
-          isConnected={isConnected}
-        />
-      ) : (
-        <LearnerScreen
-          session={session}
-          responses={responses}
-          onSubmit={handleSubmitResponse}
-          onLike={handleLike}
-          onSwitchToPresenter={() => switchView('presenter')}
-          isConnected={isConnected}
-        />
-      )}
-    </div>
+        {/* Active Screen */}
+        {currentView === 'presenter' ? (
+          <PresenterScreen
+            session={session}
+            responses={responses}
+            groups={groups}
+            joinUrl={joinUrl}
+            onLike={handleLike}
+            onReset={handleReset}
+            onSeed={handleSeed}
+            onToggleStatus={handleToggleStatus}
+            isConnected={isConnected}
+          />
+        ) : (
+          <LearnerScreen
+            session={session}
+            responses={responses}
+            onSubmit={handleSubmitResponse}
+            onLike={handleLike}
+            onSwitchToPresenter={() => switchView('presenter')}
+            isConnected={isConnected}
+          />
+        )}
+      </div>
+    </ErrorBoundary>
   );
 }
