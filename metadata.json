@@ -1,0 +1,6 @@
+{
+  "name": "팀장님 지시 업무 워크클라우드",
+  "description": "팀장님께서 지시한 업무에 대해 학습자들이 실시간으로 무엇부터 할지 익명으로 답변하고 그룹화하여 시각화하는 인터랙티브 강의 도구입니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
