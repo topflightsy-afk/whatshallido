@@ -32,7 +32,7 @@ export interface SessionState {
 }
 
 // Ensure data directory
-const DATA_DIR = path.resolve(process.cwd(), 'data');
+const DATA_DIR = process.env.VERCEL ? '/tmp' : path.resolve(process.cwd(), 'data');
 const DATA_FILE = path.join(DATA_DIR, 'responses.json');
 
 if (!fs.existsSync(DATA_DIR)) {
@@ -371,4 +371,9 @@ async function startServer() {
   });
 }
 
-startServer();
+// Export app for Vercel serverless deployment
+export default app;
+
+if (!process.env.VERCEL) {
+  startServer();
+}
