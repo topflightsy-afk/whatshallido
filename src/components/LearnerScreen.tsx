@@ -3,7 +3,6 @@ import { ResponseItem, SessionState } from '../types';
 import { CATEGORY_THEMES, DEFAULT_THEME } from '../utils/grouping';
 import {
   Send,
-  Sparkles,
   Heart,
   CheckCircle2,
   PlusCircle,
@@ -22,18 +21,6 @@ interface LearnerScreenProps {
   onSwitchToPresenter: () => void;
   isConnected: boolean;
 }
-
-const QUICK_SUGGESTIONS = [
-  '마감일(언제까지)과 우선순위 재확인',
-  '지시받은 내용 메모하고 요약해서 복창하기',
-  '업무의 진짜 목적과 기대하는 결과물 질문하기',
-  '과거 유사 보고서 및 사내 레퍼런스 양식 찾기',
-  '전체 업무를 단계별 To-Do로 쪼개고 일정 역산하기',
-  '팀장님의 의중과 맥락(Why) 추가 질문하기',
-  '중간보고(초안 30%) 일정 먼저 잡아두기',
-  '유관 부서나 협업할 팀원에게 사전 현황 공유',
-  '일단 심호흡하고 차분히 생각 정리하기',
-];
 
 export const LearnerScreen: React.FC<LearnerScreenProps> = ({
   session,
@@ -183,35 +170,15 @@ export const LearnerScreen: React.FC<LearnerScreenProps> = ({
               <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="예: 마감 기한과 우선순위부터 재확인한다 / 일단 메모하고 To-Do로 쪼갠다..."
-                rows={3}
+                placeholder="팀장님께 지시를 받은 직후, 내가 가장 먼저 취할 행동이나 생각을 솔직하게 적어주세요..."
+                rows={4}
                 maxLength={100}
                 required
-                className="w-full bg-slate-950 border border-slate-700 rounded-2xl p-3.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none transition-all"
+                className="w-full bg-slate-950 border border-slate-700/80 rounded-2xl p-4 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none transition-all leading-relaxed"
               />
-              <div className="flex justify-between items-center text-[10px] text-slate-500 mt-1">
-                <span>솔직하고 직관적인 나의 첫 행동</span>
-                <span>{inputText.length} / 100자</span>
-              </div>
-            </div>
-
-            {/* Quick Inspiration Chips */}
-            <div>
-              <div className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>터치하여 빠른 입력 힌트:</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {QUICK_SUGGESTIONS.map((sug, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setInputText(sug)}
-                    className="text-[11px] px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 active:scale-95 transition-all text-left"
-                  >
-                    {sug}
-                  </button>
-                ))}
+              <div className="flex justify-between items-center text-[11px] text-slate-400 mt-1.5 px-0.5">
+                <span>학습자의 솔직한 첫 행동을 자유롭게 남겨주세요</span>
+                <span className="font-mono text-slate-500">{inputText.length} / 100자</span>
               </div>
             </div>
 
